@@ -64,8 +64,10 @@ class Set_kelas extends CI_Controller {
     }
 
     public function edit($id) {
+		$prefix = $this->config->item('session_name_prefix');
+if ($this->session->userdata($prefix."user") == "admin") {
         $q = $this->db->query("SELECT id, nama FROM m_siswa a 
-                                WHERE YEAR(a.diterima_tgl) > 2015 AND stat_data = 'A' AND a.id NOT IN 
+                                WHERE YEAR(a.diterima_tgl) > 2010 AND stat_data = 'A' AND a.id NOT IN 
                                 (SELECT id_siswa FROM t_kelas_siswa WHERE ta = ".$this->d['ta'].") 
                                 ORDER BY id ASC");
         $r = $this->db->query("SELECT * FROM m_kelas ORDER BY tingkat ASC, nama ASC");
@@ -76,13 +78,14 @@ class Set_kelas extends CI_Controller {
         $this->d['p'] = "form";
         $this->load->view("template_utama", $this->d);
     }
+	}
 
     public function simpan() {
         $p = $this->input->post();
 
         $teks_val = array();
         foreach ($p['siswa_pilih'] as $s) {
-            $teks_val[] = "('".$p['kelas']."', '".$s."', '".date('Y')."')";
+            $teks_val[] = "('".$p['kelas']."', '".$s."', '".$this->d['ta']."')";
         }
 
         $query = "INSERT IGNORE INTO t_kelas_siswa (id_kelas, id_siswa, ta) VALUES ".implode(", ", $teks_val).";";
@@ -140,10 +143,12 @@ class Set_kelas extends CI_Controller {
                 $tampil .= '</tbody></table></div></div></div>';
             }
         }
-
+        $prefix = $this->config->item('session_name_prefix');
+if ($this->session->userdata($prefix."user") == "admin") {
         $this->d['tampil'] = $tampil;
     	$this->d['p'] = "list";
         $this->load->view("template_utama", $this->d);
+}
     }
 
 }
